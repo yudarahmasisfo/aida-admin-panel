@@ -305,11 +305,13 @@ router.post('/hapus-dokumen/:id', checkAuth, async (req, res) => {
 
 // 1. Route untuk menampilkan halaman (mengirimkan token dari cookie ke view)
 router.get('/tambah-dokumen', checkAuth, (req, res) => {
-    // Kita ambil token dari cookie untuk dikirim ke script EJS nanti
-    const token = req.cookies.token; 
-    res.render('tambah-dokumen', { token: token }); 
+    res.render('tambah-dokumen', { 
+        // Ambil token dari cookie
+        token: req.cookies.token || "", 
+        // Ambil URL backend dari .env Komodo
+        backendUrl: process.env.BACKEND_URL || 'http://localhost:3000/api' 
+    });
 });
-
 /** Halaman User  */
 // Route Tampil Semua User
 // TAMPILKAN DAFTAR USER

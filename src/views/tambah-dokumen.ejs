@@ -46,6 +46,7 @@
 
     // Ambil token yang dikirim dari Express via EJS
     const tokenDariServer = "<%= token %>"; 
+    const API_URL = "<%= backendUrl %>";
 
     form.onsubmit = async (e) => {
         e.preventDefault();
@@ -57,7 +58,7 @@
 
         try {
             // Kita arahkan fetch ke Backend (Port 3000)
-            const response = await fetch('http://localhost:3000/api/admin/dokumen/upload', {
+            const response = await fetch('${API_URL}/admin/dokumen/upload', {
                 method: 'POST',
                 headers: { 
                     // Gunakan token dari variabel server tadi
