@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<%- include('partials/head') %>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwind.min.css">
+
+<style>
+    /* Styling agar DataTable menyatu dengan desain Tailwind Bapak */
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 12px; border: 1px solid #e2e8f0; padding: 6px 12px; outline: none; margin-bottom: 10px;
+    }
+    .dataTables_length select {
+        border-radius: 8px; border: 1px solid #e2e8f0; padding: 4px 30px 4px 10px; outline: none; background-color: white; margin: 0 5px;
+    }
+    .dataTables_wrapper .dataTables_paginate {
+        margin-top: 20px; display: flex; align-items: center; gap: 4px;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border-radius: 8px !important; border: 1px solid #e2e8f0 !important; background: white !important;
+        padding: 5px 12px !important; cursor: pointer !important; color: #64748b !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #3b82f6 !important; color: white !important; border-color: #3b82f6 !important;
+    }
+    table.dataTable thead th { border-bottom: 1px solid #f1f5f9 !important; padding: 16px !important; }
+</style>
+
+<body class="bg-slate-50 flex flex-col lg:flex-row">
+    <%- include('partials/sidebar') %>
+    
+    <main class="flex-1 ml-0 lg:ml-64 p-4 lg:p-10 pt-24 lg:pt-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <div>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-slate-800">Manajemen Layanan Desa</h1>
+                    <p class="text-slate-500 mt-1">Daftar layanan yang akan dipelajari oleh AI Asisten Desa (AIDA)</p>
+                </div>
+                <a href="/tambah-layanan"
+                    class="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Tambah Layanan
+                </a>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left display" id="layananTable">
+                            <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-wider">
+                                <tr>
+                                    <th class="p-4">Nama Layanan</th>
+                                    <th class="p-4">Syarat & Ketentuan</th>
+                                    <th class="p-4 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <% data.forEach(item => { %>
+                                    <tr class="hover:bg-slate-50/80 transition">
+                                        <td class="p-4">
+                                            <div class="font-bold text-slate-700"><%= item.nama_layanan %></div>
+                                        </td>
+                                        <td class="p-4 text-sm text-slate-500">
+                                            <div class="line-clamp-2 max-w-md italic">
+                                                <%= item.syarat %>
+                                            </div>
+                                        </td>
+                                        <td class="p-4">
+                                            <div class="flex justify-center gap-3">
+                                                <a href="/edit-layanan/<%= item.id %>"
+                                                    class="bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white p-2 rounded-lg transition duration-200 border border-amber-100"
+                                                    title="Edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                </a>
+                                                <form action="/hapus-layanan/<%= item.id %>" method="POST" id="form-hapus-<%= item.id %>" class="inline">
+                                                    <button type="button"
+                                                        onclick="konfirmasiHapus('<%= item.id %>', '<%= item.nama_layanan %>')"
+                                                        class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white p-2 rounded-lg transition duration-200 border border-red-100">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#layananTable').DataTable({
+                "language": {
+                    "sLengthMenu": "Tampilkan _MENU_ data",
+                    "sSearch": "Cari:",
+                    "sInfo": "Menampilkan _START_ sampai _END_ dari _TOTAL_ layanan",
+                    "oPaginate": {
+                        "sPrevious": "‹ Prev",
+                        "sNext": "Next ›"
+                    }
+                },
+                "pageLength": 5,
+                "lengthMenu": [5, 10, 25, 50],
+                "order": [[0, "asc"]],
+                "responsive": true,
+                "dom": '<"flex flex-col md:flex-row justify-between items-center gap-4 mb-4"lf>rt<"flex flex-col md:flex-row justify-between items-center mt-4"ip>'
+            });
+        });
+
+        // Notifikasi Status (SweetAlert)
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+        if (status) {
+            const config = {
+                success: { icon: 'success', title: 'Berhasil!', text: 'Layanan baru telah ditambahkan.' },
+                update: { icon: 'success', title: 'Diperbarui!', text: 'Layanan telah diperbarui.' },
+                deleted: { icon: 'success', title: 'Terhapus!', text: 'Layanan berhasil dihapus.' },
+                error: { icon: 'error', title: 'Gagal!', text: 'Terjadi kesalahan sistem.' }
+            };
+            if(config[status]) Swal.fire({ ...config[status], timer: 2500, showConfirmButton: false });
+        }
+
+        // Konfirmasi Hapus
+        function konfirmasiHapus(id, nama) {
+            Swal.fire({
+                title: 'Hapus Layanan?',
+                text: `Layanan "${nama}" akan dihapus permanen.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('form-hapus-' + id).submit();
+                }
+            })
+        }
+    </script>
+</body>
+</html>

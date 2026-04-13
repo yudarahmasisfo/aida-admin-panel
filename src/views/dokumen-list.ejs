@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<%- include('partials/head') %>
+
+<body class="bg-slate-50 flex flex-col lg:flex-row">
+    <%- include('partials/sidebar') %>
+
+    <main class="flex-1 ml-0 lg:ml-64 p-4 lg:p-10 pt-24 lg:pt-10">
+        <div class="max-w-6xl mx-auto">
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-slate-800">Arsip Dokumen Desa</h1>
+                    <p class="text-slate-500 mt-1 text-sm">Basis pengetahuan yang telah dipelajari oleh AIDA.</p>
+                </div>
+            </div>
+
+            <div class="mb-4 flex justify-end">
+                <div class="relative w-full md:w-72">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Cari nama dokumen..." 
+                        class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition text-sm shadow-sm">
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                    <h2 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Knowledge Base AIDA</h2>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse" id="dokumenTable">
+                        <thead class="bg-slate-50 text-slate-600 uppercase text-xs font-bold tracking-wider">
+                            <tr>
+                                <th class="p-4 border-b">Nama File</th>
+                                <th class="p-4 border-b hidden md:table-cell">Kategori</th>
+                                <th class="p-4 border-b hidden md:table-cell">Tanggal Unggah</th>
+                                <th class="p-4 border-b text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <% if (data && data.length > 0) { %>
+                                <% data.forEach(doc => { %>
+                                    <tr class="hover:bg-slate-50/80 transition table-row-item">
+                                        <td class="p-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="p-2 bg-red-50 rounded-lg">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <div class="text-sm font-semibold text-slate-700 row-nama"><%= doc.nama_file %></div>
+                                                    <div class="md:hidden flex gap-2 mt-1">
+                                                        <span class="text-[10px] bg-blue-50 text-blue-600 px-2 rounded-md font-bold uppercase"><%= doc.kategori || 'Umum' %></span>
+                                                        <span class="text-[10px] text-slate-400 font-medium">
+                                                            <%= new Date(doc.createdAt).toLocaleDateString('id-ID') %>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="p-4 hidden md:table-cell">
+                                            <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-tighter">
+                                                <%= doc.kategori || 'Umum' %>
+                                            </span>
+                                        </td>
+                                        <td class="p-4 text-xs text-slate-500 hidden md:table-cell">
+                                            <%= new Date(doc.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+                                        </td>
+                                        <td class="p-4 text-center">
+                                            <form action="/hapus-dokumen/<%= doc.id %>" method="POST" id="form-hapus-<%= doc.id %>" class="inline">
+                                                <button type="button"
+                                                    onclick="konfirmasiHapus('<%= doc.id %>', '<%= doc.nama_file %>')"
+                                                    class="p-2 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-lg transition duration-200">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            <% } else { %>
+                                <tr id="emptyRow">
+                                    <td colspan="4" class="p-12 text-center">
+                                        <div class="flex flex-col items-center">
+                                            <svg class="w-12 h-12 text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                            <p class="text-slate-400 italic text-sm">Belum ada dokumen yang dipelajari AIDA.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <span class="text-sm text-slate-500" id="tableInfo"></span>
+                    <div class="flex gap-2" id="paginationButtons"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- 1. SEARCH & PAGINATION LOGIC ---
+        const searchInput = document.getElementById('searchInput');
+        const allRows = Array.from(document.querySelectorAll('.table-row-item'));
+        const infoText = document.getElementById('tableInfo');
+        const paginationContainer = document.getElementById('paginationButtons');
+        
+        let currentPage = 1;
+        const rowsPerPage = 5;
+        let filteredRows = [...allRows];
+
+        function updateTable() {
+            const totalRows = filteredRows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            allRows.forEach(row => row.classList.add('hidden'));
+            filteredRows.slice(start, end).forEach(row => row.classList.remove('hidden'));
+
+            infoText.innerText = `Menampilkan ${totalRows === 0 ? 0 : start + 1} - ${Math.min(end, totalRows)} dari ${totalRows} dokumen`;
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            paginationContainer.innerHTML = '';
+            if (totalPages <= 1) return;
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.innerText = i;
+                btn.className = `px-3 py-1 text-sm font-medium rounded-lg transition ${i === currentPage ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`;
+                btn.onclick = () => { currentPage = i; updateTable(); };
+                paginationContainer.appendChild(btn);
+            }
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            filteredRows = allRows.filter(row => row.querySelector('.row-nama').innerText.toLowerCase().includes(term));
+            currentPage = 1;
+            updateTable();
+        });
+
+        if(allRows.length > 0) updateTable();
+
+        // --- 2. SWEETALERT NOTIFICATIONS ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+        const toast = { timer: 2000, showConfirmButton: false, timerProgressBar: true };
+
+        if (status === 'deleted') Swal.fire({ ...toast, icon: 'success', title: 'Dokumen Dihapus' });
+        if (status === 'error') Swal.fire({ icon: 'error', title: 'Opps...', text: 'Gagal memproses dokumen.' });
+
+        // --- 3. KONFIRMASI HAPUS ---
+        function konfirmasiHapus(id, nama) {
+            Swal.fire({
+                title: 'Hapus Dokumen?',
+                text: `Arsip "${nama}" akan dihapus permanen!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) document.getElementById('form-hapus-' + id).submit();
+            });
+        }
+    </script>
+</body>
+</html>

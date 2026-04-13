@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<%- include('partials/head') %>
+<body class="bg-slate-50 flex flex-col lg:flex-row">
+    <%- include('partials/sidebar') %>
+
+    <main class="flex-1 ml-0 lg:ml-64 p-4 lg:p-10 pt-24 lg:pt-10">
+        <div class="max-w-2xl mx-auto">
+            <div class="mb-8">
+                <h1 class="text-2xl font-bold text-slate-800">Tambah Dokumen Knowledge</h1>
+                <p class="text-slate-500 text-sm">Upload file PDF/Word agar AIDA bisa mempelajari aturan atau SOP baru.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Pilih File (PDF, DOCX, XLSX)</label>
+                            <input type="file" name="file" id="fileInput" required
+                                class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Kategori</label>
+                            <select name="kategori" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="SOP">SOP Layanan</option>
+                                <option value="Peraturan">Peraturan Desa</option>
+                                <option value="Panduan">Panduan Warga</option>
+                                <option value="Umum" selected>Umum</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" id="btnSubmit"
+                            class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all flex justify-center items-center gap-2">
+                            <span>Mulai Proses Ekstraksi AI</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const btn = document.getElementById('btnSubmit');
+
+    // Ambil token yang dikirim dari Express via EJS
+    const tokenDariServer = "<%= token %>"; 
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        btn.disabled = true;
+        btn.innerHTML = `<span>Sedang memproses...</span>`;
+
+        const formData = new FormData(form);
+
+        try {
+            // Kita arahkan fetch ke Backend (Port 3000)
+            const response = await fetch('http://localhost:3000/api/admin/dokumen/upload', {
+                method: 'POST',
+                headers: { 
+                    // Gunakan token dari variabel server tadi
+                    'Authorization': `Bearer ${tokenDariServer}` 
+                },
+                body: formData
+            });
+
+            const resData = await response.json();
+
+            if (resData.success) {
+                Swal.fire('Berhasil!', 'AIDA sudah mempelajari dokumen tersebut.', 'success')
+                    .then(() => window.location.href = '/dokumen');
+            } else {
+                Swal.fire('Gagal', resData.message || 'Cek format file bapak.', 'error');
+            }
+        } catch (err) {
+            Swal.fire('Error', 'Gagal menghubungi Backend Port 3000.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span>Mulai Proses Ekstraksi AI</span>';
+        }
+    };
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<%- include('partials/head') %>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwind.min.css">
+
+<style>
+    /* Styling agar DataTable menyatu dengan desain Tailwind */
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 12px; border: 1px solid #e2e8f0; padding: 6px 12px; outline: none; margin-bottom: 10px;
+    }
+    .dataTables_length select {
+        border-radius: 8px; border: 1px solid #e2e8f0; padding: 4px 30px 4px 10px; outline: none; background-color: white; margin: 0 5px;
+    }
+    .dataTables_wrapper .dataTables_paginate {
+        margin-top: 20px; display: flex; align-items: center; gap: 4px;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border-radius: 8px !important; border: 1px solid #e2e8f0 !important; background: white !important;
+        padding: 5px 12px !important; cursor: pointer !important; color: #64748b !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #3b82f6 !important; color: white !important; border-color: #3b82f6 !important;
+    }
+    table.dataTable thead th { border-bottom: 1px solid #f1f5f9 !important; padding: 16px !important; }
+</style>
+
+<body class="bg-slate-50 flex flex-col lg:flex-row">
+    <%- include('partials/sidebar') %>
+
+    <main class="flex-1 ml-0 lg:ml-64 p-4 lg:p-10 pt-24 lg:pt-10">
+        <div class="max-w-6xl mx-auto">
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <div>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-slate-800">Manajemen Pengguna</h1>
+                    <p class="text-slate-500 mt-1">Kelola hak akses admin dan member sistem AIDA</p>
+                </div>
+                <a href="/tambah-user" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-200 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    Tambah User
+                </a>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6"> <div class="overflow-x-auto">
+                        <table id="userTable" class="w-full text-left display">
+                            <thead class="bg-slate-50 text-slate-600 uppercase text-xs font-bold tracking-wider">
+                                <tr>
+                                    <th class="p-4">Nama Lengkap</th>
+                                    <th class="p-4">Username</th>
+                                    <th class="p-4">Role</th>
+                                    <th class="p-4 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <% if (users && users.length > 0) { %>
+                                    <% users.forEach(user => { %>
+                                    <tr class="hover:bg-slate-50/50 transition">
+                                        <td class="p-4">
+                                            <div class="font-medium text-slate-800"><%= user.nama %></div>
+                                        </td>
+                                        <td class="p-4">
+                                            <span class="font-mono text-sm text-slate-600 bg-slate-100 px-2 py-1 rounded"><%= user.username %></span>
+                                        </td>
+                                        <td class="p-4">
+                                            <% if(user.role === 'admin') { %>
+                                                <span class="px-3 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded-full uppercase border border-red-100">Admin</span>
+                                            <% } else if(user.role === 'member') { %>
+                                                <span class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded-full uppercase border border-green-100">Member</span>
+                                            <% } else { %>
+                                                <span class="px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-full uppercase border border-slate-200">Guest</span>
+                                            <% } %>
+                                        </td>
+                                        <td class="p-4">
+                                            <div class="flex justify-center gap-2">
+                                                <a href="/edit-user/<%= user.id %>" class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Edit">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                </a>
+                                                <button onclick="confirmDelete('<%= user.id %>', '<%= user.nama %>')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Hapus">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#userTable').DataTable({
+                "language": {
+                    "sLengthMenu": "Tampilkan _MENU_ data",
+                    "sSearch": "Cari:",
+                    "sInfo": "Menampilkan _START_ sampai _END_ dari _TOTAL_ user",
+                    "oPaginate": {
+                        "sPrevious": "‹ Prev",
+                        "sNext": "Next ›"
+                    }
+                },
+                "pageLength": 10,
+                "dom": '<"flex flex-col md:flex-row justify-between items-center gap-4 mb-4"lf>rt<"flex flex-col md:flex-row justify-between items-center mt-4"ip>'
+            });
+        });
+
+        // Notifikasi Status
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('status');
+        if (status) {
+            const config = {
+                success: { icon: 'success', title: 'Berhasil!', text: 'Proses berhasil dilakukan.' },
+                update: { icon: 'success', title: 'Diperbarui!', text: 'Data telah diperbarui.' },
+                deleted: { icon: 'success', title: 'Terhapus!', text: 'Data telah dihapus.' },
+                error: { icon: 'error', title: 'Gagal!', text: 'Terjadi kesalahan server.' }
+            };
+            if(config[status]) Swal.fire(config[status]);
+        }
+
+        function confirmDelete(id, nama) {
+            Swal.fire({
+                title: 'Hapus Pengguna?',
+                text: `Akun "${nama}" akan dihapus permanen.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/delete/${id}`;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

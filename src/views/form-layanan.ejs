@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<%- include('partials/head') %>
+
+    <body class="bg-slate-100 flex flex-col lg:flex-row"> <%- include('partials/sidebar') %>
+
+            <main class="flex-1 ml-0 lg:ml-64 p-4 lg:p-10 pt-20 lg:pt-10">
+                <div class="max-w-3xl mx-auto">
+
+                    <div class="mb-6">
+                        <a href="/layanan"
+                            class="text-blue-600 hover:text-blue-800 flex items-center gap-2 text-sm font-medium">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Kembali ke Manajemen Layanan
+                        </a>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 border-b border-slate-100 p-6">
+                            <h1 class="text-xl font-bold text-slate-800">Manajemen Layanan Desa Baru</h1>
+                            <p class="text-sm text-slate-500">Isi data persyaratan layanan untuk diinformasikan ke warga
+                                via AI.</p>
+                        </div>
+
+                        <div class="p-8">
+                            <h1 class="text-xl font-bold text-slate-800 mb-6">
+                                <%= item ? 'Edit Layanan: ' + item.nama_layanan : 'Tambah Layanan Desa Baru' %>
+                            </h1>
+
+                            <form action="<%= item ? '/edit-layanan/' + item.id : '/tambah-layanan' %>" method="POST"
+                                class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Nama Layanan</label>
+                                    <input type="text" name="nama_layanan" value="<%= item ? item.nama_layanan : '' %>"
+                                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                        required>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Persyaratan</label>
+                                    <textarea name="syarat" rows="6"
+                                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                        required><%= item ? item.syarat : '' %></textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Deskripsi Singkat</label>
+                                    <textarea name="deskripsi" rows="3"
+                                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition"><%= item ? item.deskripsi : '' %></textarea>
+                                </div>
+
+                                <div class="pt-6 flex justify-end gap-3">
+                                    <a href="/layanan"
+                                        class="bg-slate-200 text-slate-700 px-8 py-3 rounded-xl font-bold">Batal</a>
+                                    <button type="submit"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg transition active:scale-95">
+                                        <%= item ? 'Update Perubahan' : 'Simpan Data Layanan' %>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </main>
+
+    </body>
+
+</html>
